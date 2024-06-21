@@ -4,9 +4,9 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client-js"
-}
+//npx prisma migrate dev --name init
+//npx prisma generate
+
 
 datasource db {
   provider = "mysql"
@@ -23,4 +23,5 @@ model Video {
   url    String
   status String
 }
+
 
