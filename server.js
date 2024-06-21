@@ -8,7 +8,7 @@ const app = express();
 const prisma = new PrismaClient();
 const storage = new Storage();
 
-const bucketName = 'YOUR_BUCKET_NAME';
+const bucketName = 'test_upload_video_dummy_app';
 
 // Middleware to handle file uploads
 const upload = multer({ storage: multer.memoryStorage() });
