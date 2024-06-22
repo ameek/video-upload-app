@@ -1,5 +1,5 @@
-# Use the official Node.js image
-FROM node:14
+# Use a newer official Node.js image that is compatible with Prisma >=16.13
+FROM node:16
 
 # Create and change to the app directory
 WORKDIR /usr/src/app
