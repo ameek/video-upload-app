@@ -19,6 +19,10 @@ const topicName = process.env.PUBSUB_TOPIC_NAME;
 // Middleware to handle file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.post("/upload", upload.single("video"), async (req, res) => {
   const file = req.file;
   const uuid = uuidv4();

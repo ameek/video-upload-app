@@ -1,4 +1,5 @@
-version: '3.1'
+version: "3.9"
+
 
 services:
   app:
@@ -14,6 +15,13 @@ services:
       PROJECT_ID: test_upload_video_dummy_app
       LOCATION: us-central1
       PUBSUB_TOPIC_NAME: your-topic-name
+    volumes:
+      - ./service-account-key.json:/service-account-key.json
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   db:
     image: mysql:5.7
