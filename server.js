@@ -56,7 +56,7 @@ app.post("/upload", upload.single("video"), async (req, res) => {
     //   },
     // });
 
-    console.log(`Created job: ${operation.name}`);
+    // console.log(`Created job: ${operation.name}`);
 
     // res.status(200).send({ uuid, url: publicUrl, jobName: operation.name });
     res.status(200).send({ uuid, url: publicUrl });
