@@ -4,7 +4,7 @@ simple video upload app
 # ENV
 env is required for for service key json
 
-# running  the app on docker
+# running the app on docker
 
 docker-compose build
 
