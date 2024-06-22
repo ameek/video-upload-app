@@ -1,6 +1,19 @@
 version: '3.1'
 
 services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql://root:rootpassword@db:3306/video_app
+      BUCKET_NAME: test_upload_video_dummy_app
+      PROJECT_ID: test_upload_video_dummy_app
+      LOCATION: us-central1
+      PUBSUB_TOPIC_NAME: your-topic-name
+
   db:
     image: mysql:5.7
     platform: linux/amd64
@@ -15,5 +28,3 @@ services:
 
 volumes:
   db_data:
-#command
-# docker-compose up -d
