@@ -10,7 +10,7 @@
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:rootpassword@localhost:3306/video_app"
+  url      = "mysql://root:rootpassword@db:3306/video_app"
 }
 
 generator client {

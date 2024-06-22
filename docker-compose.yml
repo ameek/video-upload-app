@@ -8,6 +8,7 @@ services:
     depends_on:
       - db
     environment:
+      GOOGLE_APPLICATION_CREDENTIALS: ./service-account-key.json
       DATABASE_URL: mysql://root:rootpassword@db:3306/video_app
       BUCKET_NAME: test_upload_video_dummy_app
       PROJECT_ID: test_upload_video_dummy_app
@@ -22,7 +23,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: video_app
     ports:
-      - "3306:3306"
+      - "33065:3306"
     volumes:
       - db_data:/var/lib/mysql
 
