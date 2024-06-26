@@ -7,10 +7,10 @@
 //npx prisma migrate dev --name init
 //npx prisma generate
 
-
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:rootpassword@db:3306/video_app"
+  // url      = "mysql://root:rootpassword@db:3306/video_app"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -18,10 +18,8 @@ generator client {
 }
 
 model Video {
-  id     Int     @id @default(autoincrement())
-  uuid   String  @unique
+  id     Int    @id @default(autoincrement())
+  uuid   String @unique
   url    String
   status String
 }
-
-

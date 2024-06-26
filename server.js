@@ -50,19 +50,19 @@ app.post("/upload", upload.single("video"), async (req, res) => {
       },
     });
 
-    // // Initiate video processing
-    // const [operation] = await transcoderClient.createJob({
-    //   parent: transcoderClient.locationPath(projectId, location),
-    //   job: {
-    //     inputUri: `gs://${bucketName}/${blob.name}`,
-    //     outputUri: `gs://${bucketName}/output/${uuid}/`,
-    //     templateId: 'preset/web-hd', // Example preset, replace with your actual template ID if different
-    //   },
-    // });
+    // Initiate video processing
+    const [operation] = await transcoderClient.createJob({
+      parent: transcoderClient.locationPath(projectId, location),
+      job: {
+        inputUri: `gs://${bucketName}/${blob.name}`,
+        outputUri: `gs://${bucketName}/output/${uuid}/`,
+        templateId: 'preset/web-hd', // Example preset, replace with your actual template ID if different
+      },
+    });
 
-    // console.log(`Created job: ${operation.name}`);
+    console.log(`Created job: ${operation.name}`);
 
-    // res.status(200).send({ uuid, url: publicUrl, jobName: operation.name });
+    res.status(200).send({ uuid, url: publicUrl, jobName: operation.name });
     res.status(200).send({ uuid, url: publicUrl });
   });
 
