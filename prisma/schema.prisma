@@ -9,7 +9,7 @@
 
 datasource db {
   provider = "mysql"
-  // url      = "mysql://root:rootpassword@db:3306/video_app"
+  // url      = "mysql://root:rootpassword@localhost:3306/video_app"
   url      = env("DATABASE_URL")
 }
 
@@ -22,4 +22,8 @@ model Video {
   uuid   String @unique
   url    String
   status String
+  transcodingJobId String? @unique
+  transcodingJobStatus String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

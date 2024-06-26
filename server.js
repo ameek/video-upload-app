@@ -56,11 +56,23 @@ app.post("/upload", upload.single("video"), async (req, res) => {
       job: {
         inputUri: `gs://${bucketName}/${blob.name}`,
         outputUri: `gs://${bucketName}/output/${uuid}/`,
-        templateId: 'preset/web-hd', // Example preset, replace with your actual template ID if different
+        templateId: "preset/web-hd", // Example preset, replace with your actual template ID if different
       },
     });
 
     console.log(`Created job: ${operation.name}`);
+    // putting a gaurd condition to check if the operation name is not null
+    if (!operation.name) {
+      return res.status(500).send("Error creating transcoding job");
+    }
+    const transcodingJobId = operation.name.split("/").pop();
+    await prisma.video.update({
+      where: { uuid },
+      data: {
+        transcodingJobId: transcodingJobId,
+        transcodingJobStatus: "processing",
+      },
+    });
 
     res.status(200).send({ uuid, url: publicUrl, jobName: operation.name });
   });
@@ -87,13 +99,11 @@ app.get("/update-job-status/:jobName", async (req, res) => {
   try {
     const fullJobName = transcoderClient.jobPath(projectId, location, jobName);
     const [job] = await transcoderClient.getJob({ name: fullJobName });
-    const uuid = job.inputUri.split("/").pop().split("-")[0]; // Extract UUID from inputUri
-
-    console.log(`Updating status for UUID: ${uuid}, inputUri: ${job.inputUri}`); // Added logging
-
+    
+    console.log(job);
     const updateResponse = await prisma.video.update({
-      where: { uuid },
-      data: { status: job.state },
+      where: { transcodingJobId: jobName},
+      data: { transcodingJobStatus: job.state },
     });
 
     res.status(200).send({ status: job.state, updateResponse });
@@ -101,7 +111,7 @@ app.get("/update-job-status/:jobName", async (req, res) => {
     console.error(error);
 
     // Check if the error code is P2025, indicating the record was not found
-    if (error.code === 'P2025') {
+    if (error.code === "P2025") {
       return res.status(404).send("Error: Record to update not found.");
     }
 
