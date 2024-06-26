@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 const storage = new Storage();
 const transcoderClient = new TranscoderServiceClient();
 
-//read the .env file
+// Read the .env file
 const bucketName = process.env.BUCKET_NAME;
 const projectId = process.env.PROJECT_ID;
 const location = process.env.LOCATION;
@@ -63,7 +63,6 @@ app.post("/upload", upload.single("video"), async (req, res) => {
     console.log(`Created job: ${operation.name}`);
 
     res.status(200).send({ uuid, url: publicUrl, jobName: operation.name });
-    res.status(200).send({ uuid, url: publicUrl });
   });
 
   blobStream.end(file.buffer);
@@ -73,7 +72,8 @@ app.get("/job-status/:jobName", async (req, res) => {
   const { jobName } = req.params;
 
   try {
-    const [job] = await transcoderClient.getJob({ name: jobName });
+    const fullJobName = transcoderClient.jobPath(projectId, location, jobName);
+    const [job] = await transcoderClient.getJob({ name: fullJobName });
     res.status(200).send({ status: job.state });
   } catch (error) {
     console.error(error);
@@ -85,17 +85,26 @@ app.get("/update-job-status/:jobName", async (req, res) => {
   const { jobName } = req.params;
 
   try {
-    const [job] = await transcoderClient.getJob({ name: jobName });
+    const fullJobName = transcoderClient.jobPath(projectId, location, jobName);
+    const [job] = await transcoderClient.getJob({ name: fullJobName });
     const uuid = job.inputUri.split("/").pop().split("-")[0]; // Extract UUID from inputUri
 
-    await prisma.video.update({
+    console.log(`Updating status for UUID: ${uuid}, inputUri: ${job.inputUri}`); // Added logging
+
+    const updateResponse = await prisma.video.update({
       where: { uuid },
       data: { status: job.state },
     });
 
-    res.status(200).send({ status: job.state });
+    res.status(200).send({ status: job.state, updateResponse });
   } catch (error) {
     console.error(error);
+
+    // Check if the error code is P2025, indicating the record was not found
+    if (error.code === 'P2025') {
+      return res.status(404).send("Error: Record to update not found.");
+    }
+
     res.status(500).send("Error updating job status");
   }
 });

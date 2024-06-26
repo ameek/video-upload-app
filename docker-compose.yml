@@ -1,28 +1,4 @@
-version: "3.9"
-
-
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: ./service-account-key.json
-      DATABASE_URL: mysql://root:rootpassword@db:3306/video_app
-      BUCKET_NAME: test_upload_video_dummy_app
-      PROJECT_ID: test_upload_video_dummy_app
-      LOCATION: us-central1
-      PUBSUB_TOPIC_NAME: your-topic-name
-    volumes:
-      - ./service-account-key.json:/service-account-key.json
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   db:
     image: mysql:5.7
     platform: linux/amd64
@@ -31,9 +7,52 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: video_app
     ports:
-      - "33065:3306"
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
 
 volumes:
   db_data:
+#command
+# docker-compose up -d
+
+
+# version: "3.9"
+
+
+# services:
+#   app:
+#     build: .
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - db
+#     environment:
+#       GOOGLE_APPLICATION_CREDENTIALS: ./service-account-key.json
+#       DATABASE_URL: mysql://root:rootpassword@db:3306/video_app
+#       BUCKET_NAME: test_upload_video_dummy_app
+#       PROJECT_ID: test_upload_video_dummy_app
+#       LOCATION: us-central1
+#       PUBSUB_TOPIC_NAME: your-topic-name
+#     volumes:
+#       - ./service-account-key.json:/service-account-key.json
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:3000"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+
+#   db:
+#     image: mysql:5.7
+#     platform: linux/amd64
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: rootpassword
+#       MYSQL_DATABASE: video_app
+#     ports:
+#       - "33065:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+# volumes:
+#   db_data:
