@@ -24,6 +24,7 @@ model Video {
   status String
   transcodingJobId String? @unique
   transcodingJobStatus String?
+  transcodingJobProcessTime Float?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
