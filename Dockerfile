@@ -20,4 +20,4 @@ RUN npx prisma generate
 CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
 
 # Expose the port your app runs on
-EXPOSE 3000
+EXPOSE 8080

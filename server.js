@@ -281,7 +281,7 @@ async function pullMessages() {
 pullMessages().catch(console.error);
 
 // Start the server
-const PORT = process.env.PORT || 3010;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
