@@ -6,17 +6,20 @@ const { v4: uuidv4 } = require("uuid");
 const { PrismaClient } = require("@prisma/client");
 const bodyParser = require("body-parser");
 const { calculateTranscodingDuration } = require("./util");
+const { PubSub } = require("@google-cloud/pubsub");
 
 const app = express();
 const prisma = new PrismaClient();
 const storage = new Storage();
 const transcoderClient = new TranscoderServiceClient();
+const pubsubClient = new PubSub();
 
 // Read the .env file
 const bucketName = process.env.BUCKET_NAME;
 const projectId = process.env.PROJECT_ID;
 const location = process.env.LOCATION;
 const topicName = process.env.PUBSUB_TOPIC_NAME;
+const subscriptionName = process.env.PUBSUB_SUBSCRIPTION_NAME;
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
@@ -24,6 +27,7 @@ app.use(bodyParser.json());
 // Middleware to handle file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Define the routes
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -71,30 +75,8 @@ app.post("/upload", upload.single("video"), async (req, res) => {
             },
             // Add other muxStreams configurations as needed, each with a unique key
           ],
-          //   //'config.elementaryStreams missing, expect at least one ElementaryStream'
-          //   // 'config.elementaryStreams[0].videoStream.codecSettings missing, expect either h264, h265 or vp9',
+         
           elementaryStreams: [
-            // {
-            //   videoStream: {
-            //     h264: {
-            //       profile: "high",
-            //       preset: "veryfast",
-            //       heightPixels: 360,
-            //       widthPixels: 640,
-            //       pixelFormat: "yuv420p",
-            //       bitrateBps: 550000,
-            //       rateControlMode: "vbr",
-            //       crfLevel: 21,
-            //       vbvSizeBits: 550000,
-            //       vbvFullnessBits: 495000,
-            //       entropyCoder: "cabac",
-            //       bFrameCount: 3,
-            //       frameRate: 30,
-            //       aqStrength: 1,
-            //     },
-            //   },
-            //   key: "video-stream0",
-            // },
             {
               key: "video-stream0",
               videoStream: {
@@ -122,17 +104,14 @@ app.post("/upload", upload.single("video"), async (req, res) => {
       },
     });
 
-    // putting a guard condition to check if the operation name is not null
     if (!operation.name) {
       //rollback the video record
-      //also delete from gcloud storage
-      //also delete the record from the database
       await prisma.video.delete({
         where: { uuid },
       });
       await storage.bucket(bucketName).file(blob.name).delete();
 
-      return res.status(500).send("Error creating transcoding job");
+      return res.status(500).send("Error creating transcoding job removing the video record.");
     }
     const transcodingJobId = operation.name.split("/").pop();
     console.log(`Created job: ${transcodingJobId}`);
@@ -151,6 +130,9 @@ app.post("/upload", upload.single("video"), async (req, res) => {
   blobStream.end(file.buffer);
 });
 
+
+// Handle the Pub/Sub push endpoint 
+// deprecated
 app.post("/pubsub/push", async (req, res) => {
   const message = req.body.message;
 
@@ -185,6 +167,7 @@ app.post("/pubsub/push", async (req, res) => {
   }
 });
 
+// manually check the job status
 app.get("/job-status/:jobName", async (req, res) => {
   const { jobName } = req.params;
 
@@ -198,6 +181,7 @@ app.get("/job-status/:jobName", async (req, res) => {
   }
 });
 
+// manually update the job status
 app.get("/update-job-status/:jobName", async (req, res) => {
   const { jobName } = req.params;
 
@@ -231,6 +215,72 @@ app.get("/update-job-status/:jobName", async (req, res) => {
   }
 });
 
+// Corrected function to handle transcoding time
+async function calculateJobTime(transcodingJobId) {
+  try {
+    const fullJobName = transcoderClient.jobPath(
+      projectId,
+      location,
+      transcodingJobId
+    );
+    const [job] = await transcoderClient.getJob({ name: fullJobName });
+    const transcodingTime = calculateTranscodingDuration(
+      job.startTime,
+      job.endTime
+    );
+    return transcodingTime; // Assuming you want to return the calculated time
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// New function to handle pulling messages from the subscription
+async function pullMessages() {
+  const subscription = pubsubClient.subscription(subscriptionName);
+  
+  const messageHandler = async (message) => {
+    const pubsubMessage = JSON.parse(
+      Buffer.from(message.data, "base64").toString()
+    );
+
+    const transcodingJobId = pubsubMessage.job.name.split("/").pop();
+
+    console.log(
+      `Received job ${transcodingJobId} with status ${pubsubMessage.job.state}`
+    );
+
+    // Validate message contents
+    if (!pubsubMessage) {
+      console.error("Received message with missing jobName or status");
+      return;
+    }
+    console.log(
+      `Received message for job ${pubsubMessage.job.name} with status ${pubsubMessage.job.state}`
+    );
+    // Calculate the transcoding time
+    const transcodingTime = await calculateJobTime(transcodingJobId);
+    try {
+      await prisma.video.update({
+        where: { transcodingJobId: transcodingJobId },
+        data: {
+          transcodingJobStatus:pubsubMessage.job.state,
+          transcodingJobProcessTime: transcodingTime,
+        },
+      });
+      message.ack();
+    } catch (error) {
+      console.error("Error updating job status in database:", error);
+      message.nack();
+    }
+  };
+  subscription.on("message", messageHandler);
+  console.log(`Listening for messages on ${subscriptionName}`);
+}
+
+// Start the message pulling function
+pullMessages().catch(console.error);
+
+// Start the server
 const PORT = process.env.PORT || 3010;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
