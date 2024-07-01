@@ -278,7 +278,7 @@ async function pullMessages() {
 }
 
 // Start the message pulling function
-pullMessages().catch(console.error);
+// pullMessages().catch(console.error);
 
 // Start the server
 const PORT = process.env.PORT || 8080;

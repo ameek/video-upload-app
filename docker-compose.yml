@@ -17,11 +17,7 @@ services:
       PUBSUB_SUBSCRIPTION_NAME: video-transcode-status-pull-sub
     volumes:
       - ./service-account-key.json:/service-account-key.json
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    restart: on-failure
 
   db:
     image: mysql:5.7
