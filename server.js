@@ -8,6 +8,10 @@ const bodyParser = require("body-parser");
 const { calculateTranscodingDuration } = require("./util");
 const { PubSub } = require("@google-cloud/pubsub");
 
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs"); // To parse YAML file
+const swaggerDocument = YAML.load("./swagger.yaml"); // Load your Swagger file
+
 const app = express();
 const prisma = new PrismaClient();
 const storage = new Storage();
@@ -23,9 +27,12 @@ const subscriptionName = process.env.PUBSUB_SUBSCRIPTION_NAME;
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Middleware to handle file uploads
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Serve Swagger
 
 // Define the routes
 app.get("/", (req, res) => {
@@ -75,14 +82,14 @@ app.post("/upload", upload.single("video"), async (req, res) => {
             },
             // Add other muxStreams configurations as needed, each with a unique key
           ],
-         
+
           elementaryStreams: [
             {
               key: "video-stream0",
               videoStream: {
                 h264: {
-                  heightPixels: 360,
-                  widthPixels: 640,
+                  heightPixels: 720,
+                  widthPixels: 1080,
                   bitrateBps: 550000,
                   frameRate: 60,
                 },
@@ -111,7 +118,9 @@ app.post("/upload", upload.single("video"), async (req, res) => {
       });
       await storage.bucket(bucketName).file(blob.name).delete();
 
-      return res.status(500).send("Error creating transcoding job removing the video record.");
+      return res
+        .status(500)
+        .send("Error creating transcoding job removing the video record.");
     }
     const transcodingJobId = operation.name.split("/").pop();
     console.log(`Created job: ${transcodingJobId}`);
@@ -130,8 +139,7 @@ app.post("/upload", upload.single("video"), async (req, res) => {
   blobStream.end(file.buffer);
 });
 
-
-// Handle the Pub/Sub push endpoint 
+// Handle the Pub/Sub push endpoint
 // deprecated
 app.post("/pubsub/push", async (req, res) => {
   const message = req.body.message;
@@ -237,7 +245,7 @@ async function calculateJobTime(transcodingJobId) {
 // New function to handle pulling messages from the subscription
 async function pullMessages() {
   const subscription = pubsubClient.subscription(subscriptionName);
-  
+
   const messageHandler = async (message) => {
     const pubsubMessage = JSON.parse(
       Buffer.from(message.data, "base64").toString()
@@ -263,7 +271,7 @@ async function pullMessages() {
       await prisma.video.update({
         where: { transcodingJobId: transcodingJobId },
         data: {
-          transcodingJobStatus:pubsubMessage.job.state,
+          transcodingJobStatus: pubsubMessage.job.state,
           transcodingJobProcessTime: transcodingTime,
         },
       });
@@ -278,10 +286,10 @@ async function pullMessages() {
 }
 
 // Start the message pulling function
-// pullMessages().catch(console.error);
+pullMessages().catch(console.error);
 
 // Start the server
-const PORT = process.env.PORT || 8080;
+const PORT = parseInt(process.env.PORT) || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

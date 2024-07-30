@@ -1,0 +1,1108 @@
+openapi: 3.0.0
+info:
+  title: Tier Ad Service API
+  description:
+    APIs for the Tier Ad Service.
+  version: 1.0.0
+servers:
+  - url: http://api.example.com/
+    description: Production environment server
+  - url: http://stg.example.com/
+    description: Staging environment server
+tags:
+  - name: public-ads
+    description: Operations about ads for the frontend app
+  - name: admin-ads
+    description: Operations about ads for the admin app
+  - name: admin-assets
+    description: Operations about assets for the admin app
+paths:
+  /public/v1/infeed-ads:
+    get:
+      tags:
+        - public-ads
+      summary: Get infeed ads
+      description: |
+        Get infeed ads.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+          example: "123456"
+        - name: limit
+          in: query
+          description: Number of ads to get
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: cursor
+          in: query
+          description: Cursor
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '200':
+          $ref: "#/components/responses/GetPublicInfeedAdsResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+  /public/v1/banner-ads:
+    get:
+      tags:
+        - public-ads
+      summary: Get banner ads
+      description: |
+        Get banner ads.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+          example: "123456"
+        - name: limit
+          in: query
+          description: Number of ads to get
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: cursor
+          in: query
+          description: cursor
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '200':
+          $ref: "#/components/responses/GetPublicBannerAdsResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+  /public/v1/column-ads:
+    get:
+      tags:
+        - public-ads
+      summary: Get column ads
+      description: |
+        Get column ads.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+          example: "123456"
+        - name: limit
+          in: query
+          description: Number of ads to get
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: cursor
+          in: query
+          description: Cursor
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '200':
+          $ref: "#/components/responses/GetPublicColumnAdsResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+  /admin/v1/infeed-ads:
+    get:
+      tags:
+        - admin-ads
+      summary: Get infeed ads
+      description: |
+        Get infeed ads.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of ads to get
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: cursor
+          in: query
+          description: Cursor
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        '200':
+          $ref: "#/components/responses/GetAdminInfeedAdsResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    post:
+      tags:
+        - admin-ads
+      summary: Create infeed ad
+      description: |
+        Create infeed ad.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminInfeedAdDto'
+      responses:
+        '200':
+          $ref: "#/components/responses/CreateAdminInfeedAdsResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+  /admin/v1/assets/videos:
+    get:
+      tags:
+        - admin-assets
+      summary: Get videos
+      description: |
+        Get videos.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of videos to get
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: cursor
+          in: query
+          description: Cursor
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: sort_by
+          in: query
+          description: Sort by
+          required: false
+          schema:
+            type: string
+          example: "created_at"
+        - name: sort_order
+          in: query
+          description: Sort order. "asc" or "desc", default is "asc"
+          required: false
+          schema:
+            type: string
+          example: "desc"
+      responses:
+        '200':
+          $ref: "#/components/responses/ListAssetVideosResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    post:
+      tags:
+        - admin-assets
+      summary: Upload video
+      description: |
+        Upload video. You need to call this API first to upload a video, and then call the PUT API to update the video information.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          $ref: "#/components/responses/PostAssetVideoResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+  /admin/v1/assets/videos/{id}:
+    get:
+      tags:
+        - admin-assets
+      summary: Get video
+      description: |
+        Get video.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Video asset ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/GetAssetVideoResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    put:
+      tags:
+        - admin-assets
+      summary: Update video
+      description: |
+        Update video.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Video asset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title of the video
+                  example: "Title"
+                detail:
+                  type: string
+                  description: Description of the video
+                  example: "Description"
+                video_url:
+                  type: string
+                  description: URL of the video
+                  example: "https://example.com/video.mp4"
+                thumbnail_image_url:
+                  type: string
+                  description: URL of the thumbnail image
+                  example: "https://example.com/image.jpg"
+                animal_category_id:
+                  type: integer
+                  description: Animal category ID (Tentative)
+                  example: 1
+      responses:
+        '200':
+          $ref: "#/components/responses/PutAssetVideoResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    delete:
+      tags:
+        - admin-assets
+      summary: Delete video
+      description: |
+        Delete video.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: video_asset_id
+          in: path
+          description: Video asset ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Video deleted
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+
+  /admin/v1/assets/images:
+    get:
+      tags:
+        - admin-assets
+      summary: Get images
+      description: |
+        Get images.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of images to get
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: cursor
+          in: query
+          description: Cursor
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - name: sort_by
+          in: query
+          description: Sort by
+          required: false
+          schema:
+            type: string
+          example: "created_at"
+        - name: sort_order
+          in: query
+          description: Sort order. "asc" or "desc", default is "asc"
+          required: false
+          schema:
+            type: string
+          example: "desc"
+      responses:
+        '200':
+          $ref: "#/components/responses/ListAssetImagesResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    post:
+      tags:
+        - admin-assets
+      summary: Upload image
+      description: |
+        Upload image.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          $ref: "#/components/responses/PostAssetImageResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+  /admin/v1/assets/images/{id}:
+    get:
+      tags:
+        - admin-assets
+      summary: Get image
+      description: |
+        Get image.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Image asset ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/GetAssetImageResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    put:
+      tags:
+        - admin-assets
+      summary: Update image
+      description: |
+        Update image.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Image asset ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title of the image
+                  example: "Title"
+                detail:
+                  type: string
+                  description: Description of the image
+                  example: "Description"
+                image_url:
+                  type: string
+                  description: URL of the image
+                  example: "https://example.com/image.jpg"
+                animal_category_id:
+                  type: integer
+                  description: Animal category ID (Tentative)
+                  example: 1
+      responses:
+        '200':
+          $ref: "#/components/responses/PutAssetImageResponse"
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+    delete:
+      tags:
+        - admin-assets
+      summary: Delete image
+      description: |
+        Delete image.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Image asset ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Image deleted
+        '400':
+          $ref: "#/components/responses/BadRequestError"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableError'
+
+components:
+  schemas:
+    InfeedAd:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Ad ID
+          example: 123456
+        tier_video_id:
+          type: integer
+          description: Video ID
+          example: 123456
+        valid_until:
+          type: string
+          description: Date and time when the ad is valid until.
+          example: "2024-01-31T23:59:59Z"
+        valid_weekdays:
+          type: array
+          description: Valid weekdays. 0 is Sunday, 1 is Monday, ..., 6 is Saturday.
+          items:
+            type: integer
+          example: [0, 1, 2, 3, 4, 5, 6]
+        minimum_watch_duration:
+          type: integer
+          description: Minimum watch duration in seconds
+          example: 10
+        conversion_type:
+          type: string
+          description: Conversion type. "click_link", "click_app_store", "view", "quiz"
+          example: "click_link"
+        conversion_link:
+          type: string
+          description: URL of the conversion link
+          example: "https://example.com"
+        conversion_app_store_id_ios:
+          type: string
+          description: App Store ID for iOS
+          example: "1234567890"
+        conversion_app_store_id_android:
+          type: string
+          description: App Store ID for Android
+          example: "com.example.app"
+        quiz:
+          type: object
+          $ref: '#/components/schemas/Quiz'
+      required:
+        - id
+        - tier_video_id
+        - valid_until
+        - valid_weekdays
+        - minimum_watch_duration
+        - conversion_type
+
+    InfeedAdDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Ad ID
+          example: 123456
+        tier_video_id:
+          type: integer
+          description: Video ID
+          example: 123456
+        valid_from:
+          type: string
+          description: Date and time when the ad is valid from.
+          example: "2024-01-31T23:59:59Z"
+        valid_until:
+          type: string
+          description: Date and time when the ad is valid until.
+          example: "2024-01-31T23:59:59Z"
+        valid_weekdays:
+          type: array
+          description: Valid weekdays. 0 is Sunday, 1 is Monday, ..., 6 is Saturday.
+          items:
+            type: integer
+          example: [0, 1, 2, 3, 4, 5, 6]
+        infeed_ad_type:
+          type: string
+          description: Infeed ad type. "normal" or "in-house"
+          example: "video"
+        video_title:
+          type: string
+          description: Title of the ad
+          example: "Title"
+        video_detail:
+          type: string
+          description: Detail of the ad
+          example: "Description"
+        thumbnail_image_url:
+          type: string
+          description: URL of the thumbnail image
+          example: "https://example.com/image.jpg"
+        video_url:
+          type: string
+          description: URL of the video
+          example: "https://example.com/video.mp4"
+        like_count:
+          type: integer
+          description: Number of likes
+          example: 100
+        comment_count:
+          type: integer
+          description: Number of comments
+          example: 100
+        impression_count:
+          type: integer
+          description: Number of impressions
+          example: 100
+        conversion_count:
+          type: integer
+          description: Number of conversions
+          example: 100
+        frequency_cap_count:
+          type: integer
+          description: Frequency cap
+          example: 10
+        frequency_cap_unit:
+          type: string
+          description: Frequency cap unit. "day" or "week" or "month"
+          example: "day"
+        priority_level:
+          type: integer
+          description: Priority level. You can set the priority level from 1 to 100. 100 is the highest priority.
+          example: 100
+        minimum_watch_duration:
+          type: integer
+          description: Minimum watch duration in seconds
+          example: 10
+        conversion_type:
+          type: string
+          description: Conversion type. "click_link", "click_app_store", "view", "quiz"
+          example: "click_link"
+        conversion_link:
+          type: string
+          description: URL of the conversion link
+          example: "https://example.com"
+        conversion_app_store_id_ios:
+          type: string
+          description: App Store ID for iOS
+          example: "1234567890"
+        conversion_app_store_id_android:
+          type: string
+          description: App Store ID for Android
+          example: "com.example.app"
+        quiz:
+          type: object
+          $ref: '#/components/schemas/Quiz'
+      required:
+        - id
+        - tier_video_id
+        - valid_from
+        - valid_until
+        - valid_weekdays
+        - infeed_ad_type
+        - video_title
+        - video_detail
+        - thumbnail_image_url
+        - video_url
+        - like_count
+        - comment_count
+        - impression_count
+        - conversion_count
+        - frequency_cap_count
+        - frequency_cap_unit
+        - priority_level
+        - minimum_watch_duration
+        - conversion_type
+
+    Quiz:
+      type: object
+      properties:
+        question:
+          type: string
+          description: Question
+          example: "Question"
+        choices:
+          type: array
+          description: Choices
+          items:
+            type: string
+          example: ["Choice 1", "Choice 2", "Choice 3"]
+        correct_choice:
+          type: integer
+          description: Correct choice index
+          example: 0
+    BannerAd:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Ad ID
+          example: 123456
+        tier_banner_id:
+          type: integer
+          description: Image ID
+          example: 123456
+        valid_until:
+          type: string
+          description: Date and time when the ad is valid until.
+          example: "2024-01-31T23:59:59Z"
+    ColumnAd:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Ad ID
+          example: 123456
+        tier_column_id:
+          type: integer
+          description: Column ID?
+          example: 123456
+        title:
+          type: string
+          description: Title of the ad
+          example: "Title"
+        image_url:
+          type: string
+          description: URL of the image
+          example: "https://example.com/image.jpg"
+        
+        valid_until:
+          type: string
+          description: Date and time when the ad is valid until.
+          example: "2024-01-31T23:59:59Z"
+
+    TierVideo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Video ID
+          example: 123456
+        title:
+          type: string
+          description: Title of the video
+          example: "Title"
+        detail:
+          type: string
+          description: Description of the video
+          example: "Description"
+        video_url:
+          type: string
+          description: URL of the video
+          example: "https://example.com/video.mp4"
+        thumbnail_image_url:
+          type: string
+          description: URL of the thumbnail image
+          example: "https://example.com/image.jpg"
+        animal_category_id:
+          type: integer
+          description: Animal category ID (Tentative)
+          example: 1
+
+    CreateAdminInfeedAdDto:
+      type: object
+      properties:
+        tier_video_id:
+          type: integer
+          description: Video ID
+          example: 123456
+        valid_from:
+          type: string
+          description: Date and time when the ad is valid from.
+          example: "2024-01-31T23:59:59Z"
+        valid_until:
+          type: string
+          description: Date and time when the ad is valid until.
+          example: "2024-01-31T23:59:59Z"
+        valid_weekdays:
+          type: array
+          description: Valid weekdays. 0 is Sunday, 1 is Monday, ..., 6 is Saturday.
+          items:
+            type: integer
+          example: [0, 1, 2, 3, 4, 5, 6]
+        infeed_ad_type:
+          type: string
+          description: Infeed ad type. "normal" or "in-house"
+          example: "video"
+        # video_title:
+        #   type: string
+        #   description: Title of the ad
+        #   example: "Title"
+        # video_detail:
+        #   type: string
+        #   description: Detail of the ad
+        #   example: "Description"
+        # thumbnail_image_url:
+        #   type: string
+        #   description: URL of the thumbnail image
+        #   example: "https://example.com/image.jpg"
+        # video_url:
+        #   type: string
+        #   description: URL of the video
+        #   example: "https://example.com/video.mp4"
+        minimum_watch_duration:
+          type: integer
+          description: Minimum watch duration in seconds
+          example: 10
+        conversion_type:
+          type: string
+          description: Conversion type. "click_link", "click_app_store", "view", "quiz"
+          example: "click_link"
+        conversion_link:
+          type: string
+          description: URL of the conversion link
+          example: "https://example.com"
+        conversion_app_store_id_ios:
+          type: string
+          description: App Store ID for iOS
+          example: "1234567890"
+        conversion_app_store_id_android:
+          type: string
+          description: App Store ID for Android
+          example: "com.example.app"
+        quiz:
+          type: object
+          $ref: '#/components/schemas/Quiz'
+      required:
+        - tier_video_id
+        - valid_from
+        - valid_until
+        - valid_weekdays
+        - infeed_ad_type
+        - minimum_watch_duration
+        - conversion_type
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: エラーメッセージ
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Access key
+
+  responses:
+    GetPublicInfeedAdsResponse:
+      description: Get ads response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/InfeedAd'
+    GetPublicBannerAdsResponse:
+      description: Get ads response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BannerAd'
+    GetPublicColumnAdsResponse:
+      description: Get ads response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ColumnAd'
+    GetAdminInfeedAdsResponse:
+      description: Get ads response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/InfeedAdDetail'
+    CreateAdminInfeedAdsResponse:
+      description: Create ad response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InfeedAdDetail'
+    PostAssetVideoResponse:
+      description: Video uploaded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of the uploaded video asset
+    PutAssetVideoResponse:
+      description: Video updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of the updated video asset
+                example: "123456"
+              original_video_url:
+                type: string
+                description: Original URL of the video
+                example: "https://example.com/video.mp4"
+              transcoded_video_url:
+                type: string
+                description: Transcoded URL of the video
+                example: "https://example.com/video.mp4"
+              transcoder_job_id:
+                type: string
+                description: ID of the transcoder job
+                example: "123456"
+              transcoder_job_status:
+                type: string
+                description: Status of the transcoder job
+                example: "completed"
+              tier_video:
+                $ref: '#/components/schemas/TierVideo'
+    GetAssetVideoResponse:
+      description: Get video response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of the updated video asset
+                example: "123456"
+              original_video_url:
+                type: string
+                description: Original URL of the video
+                example: "https://example.com/video.mp4"
+              transcoded_video_url:
+                type: string
+                description: Transcoded URL of the video
+                example: "https://example.com/video.mp4"
+              transcoder_job_id:
+                type: string
+                description: ID of the transcoder job
+                example: "123456"
+              transcoder_job_status:
+                type: string
+                description: Status of the transcoder job
+                example: "completed"
+              tier_video:
+                $ref: '#/components/schemas/TierVideo'
+    ListAssetVideosResponse:
+      description: List videos response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              asset_videos:
+                type: array
+                items:
+                  $ref: '#/components/responses/GetAssetVideoResponse'
+              next_cursor:
+                type: string
+                description: Next cursor
+                example: "123454"
+    PostAssetImageResponse:
+      description: Image uploaded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              image_asset_id:
+                type: string
+                description: ID of the uploaded image asset
+    PutAssetImageResponse:
+      description: Image updated
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              image_asset_id:
+                type: string
+                description: ID of the updated image asset
+                example: "123456"
+    ListAssetImagesResponse:
+      description: List images response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              asset_images:
+                type: array
+                items:
+                  $ref: '#/components/responses/GetAssetImageResponse'
+              next_cursor:
+                type: string
+                description: Next cursor
+                example: "123454"
+    GetAssetImageResponse:
+      description: Get image response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of the updated image asset
+                example: "123456"
+              image_url:
+                type: string
+                description: URL of the image
+                example: "https://example.com/image.jpg"
+              animal_category_id:
+                type: integer
+                description: Animal category ID (Tentative)
+                example: 1
+    BadRequestError:
+      description: Bad request error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedError:
+      description: Unauthorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailableError:
+      description: Service unavailable error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
